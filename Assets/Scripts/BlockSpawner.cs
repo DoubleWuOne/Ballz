@@ -6,13 +6,14 @@ using UnityEngine;
 public class BlockSpawner : MonoBehaviour
 {
     [SerializeField] private Block blockPrefab;
+    [SerializeField] private Block specialBlockPrefab;
     private float distanceBetwenBlocks = 0.55f;
     private int playWidth = 10;
     private int rowsSpawn;
     private List<Block> blockSpawned = new List<Block>();
     private void OnEnable()
     {
-        for (int i = 0; i<1; i++)
+        for (int i = 0; i < 1; i++)
         {
             SpawnRowOfBlocks();
         }
@@ -22,21 +23,32 @@ public class BlockSpawner : MonoBehaviour
     {
         foreach (var block in blockSpawned)
         {
-            if (block != null)
+            if (block != null) // nie przesuwac zniszczone bloki przypadkiem
             {
                 block.transform.position += Vector3.down * distanceBetwenBlocks;
             }
         }
         for (int i = 0; i < playWidth; i++)
         {
-            if (UnityEngine.Random.Range(0,100) < 45)
+            if (UnityEngine.Random.Range(0, 100) < 50)
             {
-                var block = Instantiate(blockPrefab, GetPosition(i),Quaternion.identity);
-                int hits = UnityEngine.Random.Range(1, 3) + rowsSpawn;
+                if (UnityEngine.Random.Range(0, 10) < 1)
+                {
+                    var block2 = Instantiate(specialBlockPrefab, GetPosition(i), Quaternion.identity);
+                    block2.SetHits(1);
+                    block2.special = true;
+                    block2.spriteRender.color = Color.green;
+                    blockSpawned.Add(block2);
+                }
+                else
+                {
+                    var block = Instantiate(blockPrefab, GetPosition(i), Quaternion.identity);
+                    int hits = UnityEngine.Random.Range(1, 3) + rowsSpawn;
 
-                block.SetHits(hits);
-
-                blockSpawned.Add(block);
+                    block.SetHits(hits);
+                    block.special = false;
+                    blockSpawned.Add(block);
+                }
             }
         }
         rowsSpawn++;

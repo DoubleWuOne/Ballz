@@ -15,7 +15,6 @@ public class MainMenu : MonoBehaviour
     public Animator transition;
     private void Start()
     {
-
         m_PlayButton.onClick.AddListener(PlayGame);
         m_QuitButton.onClick.AddListener(QuitGame);
         m_OptionsButton.onClick.AddListener(GameOptions);

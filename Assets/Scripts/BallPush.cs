@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class BallPush : MonoBehaviour
 {
     [SerializeField] Ball ballPrefab;
+    [SerializeField] TextMeshProUGUI ballnumber;
     private Vector3 startDragPosition;
     private Vector3 endDragPosition;
 
     private BlockSpawner blockSpawner;
     private LaunchPreview launchPreview;
     private List<Ball> balls = new List<Ball>();
-    private int ballsReady;
-
+    public int ballsReady;
+    public int extraballs = 0;
 
     private void Awake()
     {
@@ -27,11 +29,19 @@ public class BallPush : MonoBehaviour
         ballsReady++;
         if (ballsReady == balls.Count)
         {
+            while (extraballs != 0)
+            {
+                extraballs--;
+                CreateBall();
+            }
             blockSpawner.SpawnRowOfBlocks();
-            CreateBall();
+            CreateBall();        
         }
     }
-
+    public void test()
+    {
+        extraballs++;
+    }
     private void CreateBall()
     {
         var ball = Instantiate(ballPrefab);
@@ -41,6 +51,7 @@ public class BallPush : MonoBehaviour
     private void Update()
     {
         Vector3 worldPosition = Camera.main.ScreenToViewportPoint(Input.mousePosition) + Vector3.back * -10;
+
         if (Input.GetMouseButtonDown(0))
         {
             launchPreview.lineRenderer.enabled = true;
@@ -55,12 +66,38 @@ public class BallPush : MonoBehaviour
             EndDrag();
             launchPreview.lineRenderer.enabled = false;
         }
+        //foreach (Touch touch in Input.touches)
+        //{
+        //    if (touch.phase == TouchPhase.Began)
+        //    {
+        //        launchPreview.lineRenderer.enabled = true;
+        //        StartDrag(worldPosition);
+        //    }
+        //    if (touch.phase == TouchPhase.Moved)
+        //    {
+        //        ContinueDrag(worldPosition);
+        //    }
+        //    if (touch.phase == TouchPhase.Ended)
+        //    {
+        //        EndDrag();
+        //        launchPreview.lineRenderer.enabled = false;
+        //    }
+        //}
+
+
+        ballnumber.text = balls.Count.ToString();
 
     }
 
     private void EndDrag()
     {
-        StartCoroutine(LaunchBalls());
+
+        if (ballsReady == balls.Count)
+        {
+        //    extraballs = 0;
+            StartCoroutine(LaunchBalls());
+        }
+
     }
 
     private IEnumerator LaunchBalls()
@@ -73,10 +110,9 @@ public class BallPush : MonoBehaviour
             ball.transform.position = transform.position;
             ball.gameObject.SetActive(true);
             ball.GetComponent<Rigidbody2D>().AddForce(-direction);
-
-
+            
             ballsReady -= 1;
-            yield return new WaitForSeconds(0.1f); 
+            yield return new WaitForSeconds(0.1f);
         }
     }
 

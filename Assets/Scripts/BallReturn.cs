@@ -10,8 +10,11 @@ public class BallReturn : MonoBehaviour
         ballPush = FindObjectOfType<BallPush>();
     }
     private void OnCollisionEnter2D(Collision2D collision)
-    {
+    {        
+        if (collision.gameObject.tag == "Block")
+            Application.Quit();
         ballPush.ReturnBall();
         collision.collider.gameObject.SetActive(false);
+
     }
 }
